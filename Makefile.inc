@@ -67,7 +67,11 @@ endif
 CFLAGS += $(OPTIM)
 CFLAGS += $(DEFS)
 
+ifeq (${TARGET_LIB},)
+RPATHDIR ?= $(EXTRA_RPATHDIR)
+else
 RPATHDIR ?= $(EXTRA_RPATHDIR) $(PWD)/lib
+endif
 
 INCDIRS := $(shell [ -d include ] && find include -type d | sed -e 's:^include::')
 
