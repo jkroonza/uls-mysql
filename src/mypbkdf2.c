@@ -103,7 +103,7 @@ bool get_salt_init(UDF_INIT* initid, UDF_ARGS* args, char* message)
 	return 0;
 }
 
-unsigned char* get_salt(UDF_INIT * initid __attribute__((unused)), UDF_ARGS *args, unsigned char *result, unsigned long *length, char *is_null, char *error)
+unsigned char* get_salt(UDF_INIT * initid, UDF_ARGS *args, unsigned char *result, unsigned long *length, char *is_null, char *error)
 {
 	/* assume error */
 	*is_null = 1;
