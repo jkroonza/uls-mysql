@@ -42,3 +42,19 @@ iters is the number of iterations to run (>=1).
 This will return NULL on error (and set appropriate error message).
 
 On success it will return a byte sequence.
+
+## pipesignal.so
+
+This is in order to open a file and write a single character buffer to it, and
+close it.  This should be used carefully as it can have very serious
+performance implications.
+
+### pipesignal(path[S], string[S])
+
+Both buffers are limited to 256 characters by default.
+
+Will open(path) and then write(string) to it before closing.
+
+IMPORTANT:  Any file that's writable by the MySQL/MariaDB process can be
+overwritten using this, including stuff in datadir.  Do NOT deploy on servers
+where users can't be trusted.
