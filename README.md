@@ -72,7 +72,19 @@ MariaDB.  Still, better that the alternatives.
 This will calculate the network address of an ip/prefix pair, and return the
 base address.  As an example:
 
+```
 uls\_inet6\_network\_address("::ffff:192.168.255.0", 120) => "::ffff:192.168.240.0"
+```
 
 Which also shows that (with some foresight) these functions can also be used to
 manipulate IPv4 addresses.
+
+### uls\_inet6\_last\_address(address[S], prefixlen[I]) [S]
+
+This will calculate what was traditionally known as the broadcast address, and
+can be used for IPv4 to still calculate that.  More correctly the aim here is
+to enable things like:
+
+```
+SELECT stuff FROM table WHERE 'dead:beaf::' <= inet6_column && inet6_column <= uls_inet6_last_address('dead:beaf::', 32);
+```
