@@ -1,7 +1,6 @@
 #include <mysql/mysql.h>
 #include <arpa/inet.h>
 #include <stdio.h>
-#include <errno.h>
 #include <string.h>
 
 static
