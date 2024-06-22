@@ -34,6 +34,12 @@ void in6_set_host_bits(struct in6_addr *in6, int prefix_len)
 	in6->s6_addr32[set_index] |= htonl(last_mask);
 }
 
+#define INET6_MAX_LEN 40 /* 128 / 4 (nibbles) + 128 / 16 - 1 (colons) + 1 (trailing \0, to be safe) */
+/* this doesn't take something like
+ * ffff:ffff:ffff:ffff:ffff:ffff:123.123.123.123 into consideration, which
+ * needs 46, since the only time inet_ntop does that is with
+ * ::ffff:123.123.123.123 */
+
 bool uls_inet6_network_address_init(UDF_INIT* initid, UDF_ARGS* args, char* message)
 {
 	if (args->arg_count != 2) {
@@ -51,7 +57,7 @@ bool uls_inet6_network_address_init(UDF_INIT* initid, UDF_ARGS* args, char* mess
 	args->maybe_null[0] = 0;
 	args->maybe_null[1] = 0;
 
-	initid->max_length = 40; /* 128 / 4 (nibbles) + 128 / 16 - 1 (colons) + 1 (trailing \0, to be safe) */
+	initid->max_length = INET6_MAX_LEN;
 	initid->maybe_null = 1; /* in case of invalid input */
 
 	return 0;
@@ -71,11 +77,12 @@ char* uls_inet6_network_address(UDF_INIT * initid __attribute__((unused)), UDF_A
 
 	in6_clear_host_bits(&in6, prefix_len);
 
-	if (!inet_ntop(AF_INET6, &in6, result, *length))
+	if (!inet_ntop(AF_INET6, &in6, result, INET6_MAX_LEN))
 		return NULL;
 
 	*length = strlen(result);
 	*is_null = 0;
+
 	return result;
 }
 
@@ -116,7 +123,7 @@ char* uls_inet6_last_address(UDF_INIT * initid __attribute__((unused)), UDF_ARGS
 
 	in6_set_host_bits(&in6, prefix_len);
 
-	if (!inet_ntop(AF_INET6, &in6, result, *length))
+	if (!inet_ntop(AF_INET6, &in6, result, INET6_MAX_LEN))
 		return NULL;
 
 	*length = strlen(result);
