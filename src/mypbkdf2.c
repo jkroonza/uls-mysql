@@ -7,22 +7,6 @@
 
 #define PBKDF2_MAX_OUTPUT_SIZE 64 /* SHA512 .. SHA3 is 1600 bits, but we're not aiming at that yet */
 
-static int pbkdf2_load_uint(const char* bytes, long len)
-{
-	if (!bytes || len > 16)
-		return -1;
-	while (len > (long)sizeof(int)) {
-		if (bytes[--len])
-			return -1;
-	}
-
-	int res = 0;
-	memcpy(&res, bytes, len);
-	if (res < 1)
-		return -1;
-	return res;
-}
-
 bool pbkdf2_hmac_init(UDF_INIT* initid, UDF_ARGS* args, char* message)
 {
 	if (args->arg_count != 4) {
@@ -44,21 +28,20 @@ bool pbkdf2_hmac_init(UDF_INIT* initid, UDF_ARGS* args, char* message)
 	args->lengths[3] = sizeof(int);
 
 	initid->max_length = PBKDF2_MAX_OUTPUT_SIZE;
-	initid->maybe_null = 0;
+	initid->maybe_null = 1;
 
 	OpenSSL_add_all_digests();
 
 	return 0;
 }
 
-unsigned char* pbkdf2_hmac(UDF_INIT * initid __attribute__((unused)), UDF_ARGS *args, unsigned char *result, unsigned long *length, char *is_null, char *error)
+unsigned char* pbkdf2_hmac(UDF_INIT * initid __attribute__((unused)), UDF_ARGS *args, unsigned char *result, unsigned long *length, char *is_null, char *error __attribute__((unused)))
 {
-	/* assume error */
+	/* assume failure, to return null */
 	*is_null = 1;
-	*error = 1;
 
 	/* get number of iterations */
-	int iter = pbkdf2_load_uint(args->args[3], args->lengths[3]);
+	long long iter = *(long long*)args->args[3];
 	if (iter < 0)
 		return NULL;
 
@@ -81,7 +64,6 @@ unsigned char* pbkdf2_hmac(UDF_INIT * initid __attribute__((unused)), UDF_ARGS *
 		return NULL;
 
 	*is_null = 0;
-	*error = 0;
 
 	return result;
 }
@@ -98,18 +80,17 @@ bool get_salt_init(UDF_INIT* initid, UDF_ARGS* args, char* message)
 	args->lengths[0] = sizeof(int);
 
 	initid->max_length = 65536;
-	initid->maybe_null = 0;
+	initid->maybe_null = 1;
 
 	return 0;
 }
 
-unsigned char* get_salt(UDF_INIT * initid, UDF_ARGS *args, unsigned char *result, unsigned long *length, char *is_null, char *error)
+unsigned char* get_salt(UDF_INIT * initid, UDF_ARGS *args, unsigned char *result, unsigned long *length, char *is_null, char *error __attribute__((unused)))
 {
-	/* assume error */
+	/* assume failure, and thus return NULL */
 	*is_null = 1;
-	*error = 1;
 
-	int bytes = pbkdf2_load_uint(args->args[0], args->lengths[0]);
+	long long bytes = *(long long*)args->args[0];
 	if (bytes < 1)
 		return NULL;
 
@@ -128,7 +109,6 @@ unsigned char* get_salt(UDF_INIT * initid, UDF_ARGS *args, unsigned char *result
 		return NULL;
 
 	*is_null = 0;
-	*error = 0;
 
 	return result;
 }
