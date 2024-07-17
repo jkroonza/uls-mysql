@@ -7,7 +7,7 @@ static
 void in6_clear_host_bits(struct in6_addr *in6, int prefix_len)
 {
 	int bits_to_clear = 128 - prefix_len;
-	int clear_index = prefix_len >> 5; /* we deal with 32 bits at a time */
+	int clear_index = 128 / 32 - 1;
 
 	while (bits_to_clear >= 32) {
 		in6->s6_addr32[clear_index--] = 0;
@@ -22,7 +22,7 @@ static
 void in6_set_host_bits(struct in6_addr *in6, int prefix_len)
 {
 	int bits_to_set = 128 - prefix_len;
-	int set_index = prefix_len >> 5; /* we deal with 32 bits at a time */
+	int set_index = 128 / 32 - 1;
 
 	while (bits_to_set >= 32) {
 		in6->s6_addr32[set_index--] = ~0U;
