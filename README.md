@@ -67,6 +67,23 @@ them to a string before passing them to us, and then for most calculations we
 want a binary format, and then convert back to string before handing back to
 MariaDB.  Still, better that the alternatives.
 
+*IMPORTANT*: MariaDB and UDFs combined with non-basic types (like inet6) is a
+mess.  Since the function is accepting a string it will cast from INET6 to
+STRING, so this is inefficient due to back and forth conversions, but more
+importantly, we can't specify the character set.  MySQL has some stuff for
+that, but it doesn't have an INET6 data type.  For this reason, use:
+
+```
+CAST(uls_inet6_*(prefix, length) AS CHAR)
+```
+
+Which will fix the type, and result in the correct result.
+
+The real fix here is twofold:
+
+1. For MySQL we need to integrate the string typing.
+1. For MariaDB we should rather use the PLUGIN architecture rather than an UDF.
+
 ### uls\_inet6\_network\_address(address[S], prefixlen[I]) [S]
 
 This will calculate the network address of an ip/prefix pair, and return the
