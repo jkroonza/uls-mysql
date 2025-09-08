@@ -2,6 +2,7 @@
 #include <arpa/inet.h>
 #include <stdio.h>
 #include <string.h>
+#include <stdbool.h>
 
 static
 void in6_clear_host_bits(struct in6_addr *in6, int prefix_len)
