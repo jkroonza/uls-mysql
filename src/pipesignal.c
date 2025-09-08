@@ -3,6 +3,7 @@
 #include <string.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include <stdbool.h>
 
 #ifndef PIPESIGNAL_SAFEBASE
 #warning You really aught to pass EXTRA_CFLAGS='-DPIPESIGNAL_SAFEBASE=\"/some/path/\"'
