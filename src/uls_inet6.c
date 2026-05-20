@@ -66,8 +66,20 @@ bool uls_inet6_network_address_init(UDF_INIT* initid, UDF_ARGS* args, char* mess
 char* uls_inet6_network_address(UDF_INIT * initid __attribute__((unused)), UDF_ARGS *args, char *result, unsigned long *length, char *is_null, char *error __attribute__((unused)))
 {
 	struct in6_addr in6;
-	long long prefix_len = *(long long*)args->args[1];
+	long long prefix_len;
 	*is_null = 1;
+
+	if (!args->args[0])
+		return NULL;
+
+	if (!args->args[1]) {
+		strcpy(result, args->args[0]);
+		*length = args->lengths[0];
+		*is_null = 0;
+		return result;
+	}
+
+	prefix_len = *(long long*)args->args[1];
 
 	if (prefix_len < 0 || prefix_len > 128)
 		return NULL;
@@ -112,8 +124,20 @@ bool uls_inet6_last_address_init(UDF_INIT* initid, UDF_ARGS* args, char* message
 char* uls_inet6_last_address(UDF_INIT * initid __attribute__((unused)), UDF_ARGS *args, char *result, unsigned long *length, char *is_null, char *error __attribute__((unused)))
 {
 	struct in6_addr in6;
-	long long prefix_len = *(long long*)args->args[1];
+	long long prefix_len;
 	*is_null = 1;
+
+	if (!args->args[0])
+		return NULL;
+
+	if (!args->args[1]) {
+		strcpy(result, args->args[0]);
+		*length = args->lengths[0];
+		*is_null = 0;
+		return result;
+	}
+
+	prefix_len = *(long long*)args->args[1];
 
 	if (prefix_len < 0 || prefix_len > 128)
 		return NULL;
